@@ -80,13 +80,30 @@ class RequestHandle implements Runnable
 			System.out.println("File Does Not Exist.");
 		}
 
-		outStream.println("HTTP/1.1 200 OK");
+
+		//Response messages
+		String statusCode = "";
+		String fileType = "";
+		String fileData = "";
+
+		if (fileExists) {
+			statusCode = "HTTP/1.1 200 OK";
+			fileType = "Content_Type:text/html";
+			int s;
+			while ((s = fileInputStream.read()) != -1) {
+				fileData += (char) s;
+			}
+		} else {
+			statusCode = "HTTP/1.1 404 Not Found";
+			fileData = "404 Not Found";
+		}
+
+		outStream.println(statusCode);
 		outStream.println("MIME_version:1.0");
-		outStream.println("Content_Type:text/html");
-		String content = "<html><head></head><body> <h1> hi </h1></Body></html>";
-		outStream.println("Content_Length:" + content.length());
+		outStream.println(fileType);
+		outStream.println("Content_Length:" + fileData.length());
 		outStream.println("");
-		outStream.println(content);
+		outStream.println(fileData);
 
 		outStream.close();
 		bufferedReader.close();
