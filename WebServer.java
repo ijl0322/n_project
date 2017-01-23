@@ -74,12 +74,14 @@ class RequestHandle implements Runnable
 			fileExists = false;
 		}
 
+		//Debugging block
 		if (fileExists) {
+			System.out.println();
 			System.out.println("File Exists.");
+			System.out.println("File is of type: " + getFileType(fileName));
 		} else {
 			System.out.println("File Does Not Exist.");
 		}
-
 
 		//Response messages
 		String statusCode = "";
@@ -88,7 +90,7 @@ class RequestHandle implements Runnable
 
 		if (fileExists) {
 			statusCode = "HTTP/1.1 200 OK";
-			fileType = "Content_Type:text/html";
+			fileType = "Content_Type:" + getFileType(fileName); //This may be causing problem with Java Null Pointer Exception ?
 			int s;
 			while ((s = fileInputStream.read()) != -1) {
 				fileData += (char) s;
@@ -110,4 +112,22 @@ class RequestHandle implements Runnable
 		socket.close();
 	}
 
+	private String getFileType(String fileName){
+		if (fileName.endsWith(".html") || fileName.endsWith(".htm")) {
+			return "text/html";
+		}
+		if (fileName.endsWith(".txt")) {
+			return "text/plain";
+		}
+		if (fileName.endsWith(".pdf")) {
+			return "application/pdf";
+		}
+		if (fileName.endsWith(".png")) {
+			return "image/png";
+		}
+		if (fileName.endsWith(".jpeg") || fileName.endsWith(".jpg")) {
+			return "image/jpeg";
+		}
+		return "text/html";
+	}
 }
