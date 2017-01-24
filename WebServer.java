@@ -64,6 +64,25 @@ class RequestHandle implements Runnable
 			System.out.println(request_contents);
 		}
 
+		//Getting the contents of redirect file
+		FileInputStream redirectFile = null;
+		String redirectFileContent = "";
+		try {
+			redirectFile = new FileInputStream(root + "/redirect.defs");
+			int s;
+			while ((s = redirectFile.read()) != -1) {
+				redirectFileContent += (char) s;
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("Redirect file does not exist");
+		}
+		System.out.println(redirectFileContent);
+		String[] redirectlines = redirectFileContent.split("\n");
+
+
+
+
+
 		//Opening File
 		FileInputStream fileInputStream = null;
 		boolean fileExists = true;
