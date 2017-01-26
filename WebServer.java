@@ -79,6 +79,16 @@ class RequestHandle implements Runnable
 		System.out.println(redirectFileContent);
 		String[] redirectlines = redirectFileContent.split("\n");
 
+		for (String s: redirectlines) {
+			if (s.split(" ")[0].equals(fileName)){
+				outStream.println("HTTP/1.1 301");
+				outStream.println("Location: " + s.split(" ")[1]);
+				outStream.println("");
+				outStream.println(s.split(" ")[1]);
+				System.out.println(s.split(" ")[1]);
+
+			}
+		}
 
 
 
@@ -103,28 +113,35 @@ class RequestHandle implements Runnable
 		}
 
 		//Response messages
-		String statusCode = "";
-		String fileType = "";
 		String fileData = "";
 
-		if (fileExists) {
-			statusCode = "HTTP/1.1 200 OK";
-			fileType = "Content_Type:" + getFileType(fileName); //This may be causing problem with Java Null Pointer Exception ?
+		if (fileName.equals("/redirect.defs"))
+		{
+			outStream.println("HTTP/1.1 404 Not Found");
+		}
+		else if (!requestCommand.equals("GET") && !requestCommand.equals("HEAD"))
+		{
+			outStream.println("HTTP/1.1  403 Forbidden");
+		}
+		else if (fileExists) {
+			//This may be causing problem with Java Null Pointer Exception ?
 			int s;
 			while ((s = fileInputStream.read()) != -1) {
 				fileData += (char) s;
 			}
-		} else {
-			statusCode = "HTTP/1.1 404 Not Found";
-			fileData = "404 Not Found";
-		}
+			outStream.println("HTTP/1.1 200 OK");
+			outStream.println("MIME_version:1.0");
+			outStream.println("Content_Type:" + getFileType(fileName));
+			outStream.println("Content_Length:" + fileData.length());
+			outStream.println("");
 
-		outStream.println(statusCode);
-		outStream.println("MIME_version:1.0");
-		outStream.println(fileType);
-		outStream.println("Content_Length:" + fileData.length());
-		outStream.println("");
-		outStream.println(fileData);
+			if (requestCommand.equals("GET")) {
+				outStream.println(fileData);
+			}
+
+		} else {
+			outStream.println("HTTP/1.1 404 Not Found");
+		}
 
 		outStream.close();
 		bufferedReader.close();
